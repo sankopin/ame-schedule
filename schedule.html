@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>公開排單</title>
+<style>
+  :root{
+    --bg:#f8f7fc;
+    --panel:#ffffff;
+    --border:#e7e1f4;
+    --line:rgba(167,142,220,.20);
+    --text:rgba(0,0,0,.78);
+    --muted:rgba(0,0,0,.50);
+    --purple:rgb(139,109,216);
+    --purple2:rgb(167,142,220);
+    --purpleSoft:rgba(167,142,220,.16);
+    --green:rgb(110,180,135);
+    --greenSoft:rgba(110,180,135,.13);
+    --shadow:0 14px 36px rgba(65,45,110,.10);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    padding:38px 18px 56px;
+    background:
+      radial-gradient(circle at top left, rgba(167,142,220,.24), transparent 34%),
+      linear-gradient(180deg, #fbfaff 0%, var(--bg) 42%, #f7f8fb 100%);
+    color:var(--text);
+    font-family:ui-sans-serif,system-ui,-apple-system,"PingFang TC","Microsoft JhengHei",Arial;
+    font-size:17px;
+    line-height:1.65;
+  }
+  .wrap{max-width:1040px;margin:0 auto;}
+  .hero{
+    margin-bottom:18px;
+    padding:24px 26px;
+    border:1px solid rgba(167,142,220,.28);
+    border-radius:26px;
+    background:rgba(255,255,255,.82);
+    box-shadow:var(--shadow);
+    backdrop-filter: blur(10px);
+  }
+  .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:8px;
+    padding:5px 12px;
+    border-radius:999px;
+    background:var(--purpleSoft);
+    color:var(--purple);
+    font-size:13px;
+    font-weight:950;
+  }
+  h1{
+    margin:0;
+    font-size:32px;
+    line-height:1.25;
+    letter-spacing:.4px;
+    color:rgba(0,0,0,.82);
+  }
+  .sub{
+    margin-top:10px;
+    color:var(--muted);
+    font-size:15px;
+  }
+  .stats{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:18px;
+  }
+  .stat{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:9px 14px;
+    border-radius:16px;
+    background:#fff;
+    border:1px solid var(--border);
+    font-size:15px;
+    font-weight:900;
+    color:rgba(0,0,0,.70);
+  }
+  .table-card{
+    overflow:hidden;
+    border:1px solid var(--border);
+    border-radius:24px;
+    background:rgba(255,255,255,.94);
+    box-shadow:0 10px 28px rgba(65,45,110,.08);
+  }
+  .table-scroll{overflow-x:auto;}
+  table{
+    width:100%;
+    min-width:900px;
+    border-collapse:separate;
+    border-spacing:0;
+  }
+  th,td{
+    border-bottom:1px solid var(--line);
+    text-align:left;
+    vertical-align:middle;
+  }
+  th{
+    padding:14px 16px;
+    background:#faf9ff;
+    color:var(--muted);
+    font-size:13px;
+    font-weight:950;
+    letter-spacing:.3px;
+    white-space:nowrap;
+  }
+  td{
+    padding:18px 16px;
+    font-size:16px;
+    color:rgba(0,0,0,.72);
+  }
+  tr:last-child td{border-bottom:none;}
+  tbody tr{transition:background .15s ease;}
+  tbody tr:hover{background:rgba(167,142,220,.08);}
+  .queue-no{width:72px;text-align:center;}
+  .queue-no span{
+    display:inline-flex;
+    justify-content:center;
+    min-width:44px;
+    padding:4px 9px;
+    border-radius:999px;
+    background:var(--purpleSoft);
+    color:var(--purple);
+    font-size:13px;
+    font-weight:950;
+  }
+  .client-cell{
+    width:150px;
+    white-space:nowrap;
+  }
+  .avatar{
+    width:34px;
+    height:34px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    margin-right:10px;
+    border-radius:13px;
+    background:linear-gradient(135deg, rgba(167,142,220,.95), rgba(139,109,216,.85));
+    color:#fff;
+    font-size:16px;
+    font-weight:950;
+    box-shadow:0 7px 16px rgba(139,109,216,.18);
+    vertical-align:middle;
+  }
+  .client-name{
+    color:var(--purple);
+    font-size:20px;
+    font-weight:950;
+    letter-spacing:.4px;
+    vertical-align:middle;
+  }
+  .item-cell{
+    width:210px;
+    color:rgba(0,0,0,.84);
+    font-size:18px;
+    font-weight:950;
+  }
+  .date-cell{
+    width:112px;
+    white-space:nowrap;
+  }
+  .date-cell span{
+    display:inline-flex;
+    align-items:center;
+    padding:6px 11px;
+    border-radius:999px;
+    background:var(--greenSoft);
+    border:1px solid rgba(110,180,135,.28);
+    color:rgba(0,0,0,.70);
+    font-size:15px;
+    font-weight:900;
+  }
+  .note-cell{
+    min-width:220px;
+    white-space:pre-wrap;
+    word-break:break-word;
+    color:rgba(0,0,0,.66);
+    font-size:15px;
+    font-weight:700;
+    line-height:1.65;
+  }
+  .status-cell{
+    width:132px;
+    white-space:nowrap;
+  }
+  .status-pill{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:5px;
+    min-width:92px;
+    padding:6px 11px;
+    border-radius:999px;
+    font-size:14px;
+    font-weight:950;
+    border:1px solid transparent;
+  }
+  .status-wait{
+    background:rgba(0,0,0,.045);
+    border-color:rgba(0,0,0,.08);
+    color:rgba(0,0,0,.52);
+  }
+  .status-progress{
+    background:var(--purpleSoft);
+    border-color:rgba(167,142,220,.32);
+    color:var(--purple);
+  }
+  .status-done{
+    background:var(--greenSoft);
+    border-color:rgba(110,180,135,.28);
+    color:var(--green);
+  }
+  .empty-cell{
+    padding:46px 18px;
+    text-align:center;
+    color:var(--muted);
+  }
+  .empty-icon{font-size:34px;margin-bottom:8px;}
+  .empty-title{font-size:20px;font-weight:950;color:rgba(0,0,0,.72);}
+  .empty-text{margin-top:4px;font-size:15px;}
+  .footer{
+    margin-top:18px;
+    color:var(--muted);
+    font-size:13px;
+    text-align:right;
+  }
+  @media (max-width: 700px){
+    body{padding:22px 12px 40px;font-size:16px;}
+    .hero{padding:20px 18px;border-radius:22px;}
+    h1{font-size:27px;}
+    .sub{font-size:14px;}
+    .table-card{border-radius:20px;}
+    th{padding:12px 13px;font-size:12px;}
+    td{padding:15px 13px;}
+    .client-name{font-size:19px;}
+    .item-cell{font-size:17px;}
+  }
+</style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="hero">
+      <div class="eyebrow">💜 Commission Queue</div>
+      <h1>委託進行狀況</h1>
+      <div class="sub">。</div>
+      <div class="stats">
+        <div class="stat">目前排單：6 件</div>
+        <div class="stat">預計排至：2026/7</div>
+        <div class="stat">最後更新：2026-06-21 16:40:02</div>
+      </div>
+    </section>
+
+    <section class="table-card">
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>順序</th>
+              <th>委託人</th>
+              <th>項目</th>
+              <th>開工</th>
+              <th>DDL</th>
+              <th>備註</th>
+              <th>狀態</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+      <tr>
+        <td class="queue-no"><span>#01</span></td>
+        <td class="client-cell">
+          <span class="avatar">a</span>
+          <span class="client-name">a＊</span>
+        </td>
+        <td class="item-cell">組合頁A</td>
+        <td class="date-cell"><span>5/28</span></td>
+        <td class="date-cell"><span>6/27</span></td>
+        <td class="note-cell">—</td>
+        <td class="status-cell"><span class="status-pill status-progress">🎨 進行中</span></td>
+      </tr>
+    
+      <tr>
+        <td class="queue-no"><span>#02</span></td>
+        <td class="client-cell">
+          <span class="avatar">柚</span>
+          <span class="client-name">柚＊</span>
+        </td>
+        <td class="item-cell">性轉組合頁</td>
+        <td class="date-cell"><span>未定</span></td>
+        <td class="date-cell"><span>6/30</span></td>
+        <td class="note-cell">—</td>
+        <td class="status-cell"><span class="status-pill status-wait">⏳ 排隊中</span></td>
+      </tr>
+    
+      <tr>
+        <td class="queue-no"><span>#03</span></td>
+        <td class="client-cell">
+          <span class="avatar">舞</span>
+          <span class="client-name">舞＊</span>
+        </td>
+        <td class="item-cell">組合頁B</td>
+        <td class="date-cell"><span>未定</span></td>
+        <td class="date-cell"><span>6/30</span></td>
+        <td class="note-cell">—</td>
+        <td class="status-cell"><span class="status-pill status-wait">⏳ 排隊中</span></td>
+      </tr>
+    
+      <tr>
+        <td class="queue-no"><span>#04</span></td>
+        <td class="client-cell">
+          <span class="avatar">藍</span>
+          <span class="client-name">藍＊</span>
+        </td>
+        <td class="item-cell">草稿服設</td>
+        <td class="date-cell"><span>6/10</span></td>
+        <td class="date-cell"><span>6/30</span></td>
+        <td class="note-cell">—</td>
+        <td class="status-cell"><span class="status-pill status-progress">🎨 進行中</span></td>
+      </tr>
+    
+      <tr>
+        <td class="queue-no"><span>#05</span></td>
+        <td class="client-cell">
+          <span class="avatar">桃</span>
+          <span class="client-name">桃＊</span>
+        </td>
+        <td class="item-cell">草稿服設</td>
+        <td class="date-cell"><span>6/10</span></td>
+        <td class="date-cell"><span>6/30</span></td>
+        <td class="note-cell">—</td>
+        <td class="status-cell"><span class="status-pill status-progress">🎨 進行中</span></td>
+      </tr>
+    
+      <tr>
+        <td class="queue-no"><span>#06</span></td>
+        <td class="client-cell">
+          <span class="avatar">吳</span>
+          <span class="client-name">吳＊</span>
+        </td>
+        <td class="item-cell">組合頁A</td>
+        <td class="date-cell"><span>6/12</span></td>
+        <td class="date-cell"><span>7/3</span></td>
+        <td class="note-cell">—</td>
+        <td class="status-cell"><span class="status-pill status-progress">🎨 進行中</span></td>
+      </tr>
+    
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="footer">Generated by 品</div>
+  </main>
+</body>
+</html>
